@@ -61,7 +61,7 @@ I libri già presenti in biblioteca, cioè con lo stesso autore e lo stesso tito
 
 Gli elenchi dei già presenti e degli errori mostrano al massimo 30 voci ciascuno.
 
-L'importazione avviene in un'unica transazione del database. Così un'importazione interrotta a metà non lascia nel database solo una parte dei libri.
+L'importazione dei dati è atomica sul database; eventuali copertine già copiate prima di un errore possono restare in `uploads/` e si possono eliminare a mano.
 
 ## Importa un autore dal web
 

@@ -6,8 +6,9 @@ Le azioni di scrittura non richiedono autenticazione. Leggi [Sicurezza e backup]
 
 ## Formato delle richieste e delle risposte
 
-- Ogni richiesta indica l'azione nel parametro `a`, per esempio `api.php?a=autori`.
-- Le letture usano `GET`, le scritture usano `POST`.
+- Con l'installazione predefinita, l'API si trova all'indirizzo `http://localhost/biblioteca-personale/api.php`.
+- Ogni richiesta indica l'azione nel parametro `a` della query string, per esempio `api.php?a=autori`.
+- Le letture usano `GET`. Le scritture usano `POST`: l'azione resta nella query string e i dati vanno nel corpo della richiesta.
 - Le risposte sono in JSON.
 - Un errore restituisce un oggetto con la chiave `errore`, per esempio `{"errore": "..."}`, con il codice HTTP corrispondente.
 - Un errore interno restituisce il codice 500 con un messaggio generico. Il dettaglio dell'errore finisce solo nel log di PHP, non nella risposta.
@@ -37,12 +38,35 @@ GET api.php?a=cerca&q=rosa
 | `nuovo-libro` | Aggiunge un libro. Risponde con il codice 201. |
 | `modifica-libro` | Modifica un libro esistente. |
 | `elimina-libro` | Elimina un libro. |
-| `modifica-autore` | Modifica un autore: campi `nome`, `foto` e `rimuovi_foto`. Risponde con il codice 409 se esiste già un altro autore con lo stesso nome. |
+| `modifica-autore` | Modifica il nome o la foto di un autore. Risponde con il codice 409 se esiste già un altro autore con lo stesso nome. |
 | `elimina-autore` | Elimina un autore, i suoi libri e i file delle loro immagini. |
 | `importa-csv` | Importa libri da un file CSV. Vedi [Importa libri da un file CSV](guida-uso.md#importa-libri-da-un-file-csv). |
 | `importa-autore` | Salva i libri scelti dopo `anteprima-autore`. Vedi [Importa un autore dal web](guida-uso.md#importa-un-autore-dal-web). |
 
-Per i nomi esatti dei campi inviati con ogni azione, consulta `api.php` e il codice che li invia in `assets/app.js`.
+### Campi delle scritture
+
+| Azione | Campi nel corpo della richiesta |
+| --- | --- |
+| `nuovo-libro` | I campi del libro, descritti nella tabella seguente. |
+| `modifica-libro` | `id` del libro, i campi del libro e, facoltativo, `rimuovi_copertina=1` per eliminare la copertina. |
+| `elimina-libro` | `id` del libro. |
+| `modifica-autore` | `id`, `nome` (obbligatorio, massimo 120 caratteri), `foto` (file immagine) e, facoltativo, `rimuovi_foto=1` per eliminare la foto. |
+| `elimina-autore` | `id` dell'autore. |
+| `importa-csv` | Il file CSV nel campo `file`. |
+| `importa-autore` | `nome` dell'autore e `libri`: un array JSON di oggetti con `titolo`, `coautore`, `protagonista`, `anno`, `pagine`, `editore`, `serie` e `sinossi`. Al massimo 300 elementi. |
+
+`nuovo-libro` e `modifica-libro` ricevono un form multipart con questi campi:
+
+| Campo | Tipo e limiti |
+| --- | --- |
+| `titolo` | Obbligatorio, massimo 200 caratteri. |
+| `autore` | Obbligatorio, massimo 120 caratteri. |
+| `titolo_originale`, `coautore`, `traduttore`, `protagonista` | Massimo 200 caratteri ciascuno. |
+| `anno`, `pagine` | Numeri interi. |
+| `editore`, `serie` | Massimo 120 caratteri ciascuno. |
+| `sinossi` | Massimo 5000 caratteri. |
+| `estratto` | Massimo 20000 caratteri. |
+| `copertina` | File immagine. |
 
 ## Regole di validazione dei libri
 
@@ -51,13 +75,6 @@ Quando aggiungi o modifichi un libro:
 - Titolo e autore sono obbligatori.
 - Se l'autore non esiste, viene creato. Il confronto con gli autori esistenti non distingue maiuscole e minuscole, quindi `umberto eco` corrisponde a `Umberto Eco`.
 - L'anno, se indicato, deve essere compreso tra 1 e l'anno corrente più uno.
-- I campi hanno queste lunghezze massime:
-
-  | Campo | Lunghezza massima |
-  | --- | --- |
-  | Titolo | 200 caratteri |
-  | Autore | 120 caratteri |
-  | Sinossi | 5000 caratteri |
-  | Estratto | 20000 caratteri |
+- I campi rispettano le lunghezze massime indicate in [Campi delle scritture](#campi-delle-scritture).
 
 Per i limiti sulle immagini, consulta [Gestisci le immagini](guida-uso.md#gestisci-le-immagini).

@@ -12,7 +12,7 @@ Questa pagina spiega come avviare biblioteca-personale sul tuo computer con XAMP
 Apri l'applicazione sempre attraverso Apache. Se apri `index.php` direttamente come file dal disco, il browser non esegue PHP e l'applicazione non funziona.
 
 1. Nel pannello di controllo di XAMPP, avvia **Apache**.
-2. Nel browser, apri `http://localhost/` seguito dal nome della cartella del progetto dentro `htdocs`.
+2. Nel browser, apri `http://localhost/biblioteca-personale/`. L'indirizzo corrisponde al nome della cartella del progetto dentro `htdocs`.
 
 ## Cosa succede al primo accesso
 
@@ -24,7 +24,11 @@ Al primo accesso, la funzione `db()` in `db.php`:
 
 I dati di esempio servono solo a provare l'applicazione. Eliminali e sostituiscili con i libri della tua biblioteca, a mano o con l'[importazione da CSV](guida-uso.md#importa-libri-da-un-file-csv).
 
-Poiché l'applicazione crea il database e salva le immagini caricate, Apache deve poter scrivere nelle cartelle `data/` e `uploads/`.
+## Permessi di scrittura
+
+PHP crea il file `data/biblioteca.sqlite` al primo accesso e salva le immagini caricate in `uploads/`, nelle sottocartelle `uploads/copertine/` e `uploads/autori/`, che crea se mancano. Per questo l'utente con cui gira Apache deve poter scrivere nelle cartelle `data/` e `uploads/`.
+
+Con XAMPP su Windows, di norma Apache ha già questi permessi e non devi configurare nulla.
 
 ## Aggiornamenti dello schema
 
